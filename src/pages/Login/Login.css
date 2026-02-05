@@ -158,6 +158,96 @@
     color: var(--color-gray-500);
 }
 
+/* Auth Tabs */
+.auth-tabs {
+    display: flex;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-xl);
+    padding: 4px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-500);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.auth-tab:hover {
+    color: var(--color-gray-700);
+}
+
+.auth-tab.active {
+    color: var(--color-gray-900);
+    background: var(--color-white);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Auth Success */
+.auth-success {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-lg);
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+}
+
+.success-icon {
+    font-size: var(--font-size-lg);
+}
+
+/* Form Divider */
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    color: var(--color-gray-400);
+    font-size: var(--font-size-sm);
+}
+
+.form-divider::before,
+.form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-gray-200);
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    padding: var(--spacing-4);
+    font-size: var(--font-size-lg);
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: var(--spacing-4);
+    background: transparent;
+    border: none;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    padding: var(--spacing-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    color: var(--color-gray-600);
+}
+
 /* Form Styles */
 .login-form {
     display: flex;
@@ -194,7 +284,7 @@
 .form-input {
     width: 100%;
     padding: var(--spacing-4);
-    padding-left: calc(var(--spacing-4) + 28px);
+    padding-left: 48px;
     font-size: var(--font-size-base);
     color: var(--color-gray-800);
     background: var(--color-gray-50);
@@ -390,4 +480,101 @@
     .social-login {
         grid-template-columns: 1fr;
     }
+}
+
+/* Google OAuth Button */
+.google-signin-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4) var(--spacing-6);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-700);
+    background: var(--color-white);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.google-signin-btn:hover:not(:disabled) {
+    border-color: var(--color-gray-300);
+    background: var(--color-gray-50);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.google-signin-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Auth Error */
+.auth-error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-lg);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+}
+
+.error-icon {
+    font-size: var(--font-size-lg);
+}
+
+/* Login Info */
+.login-info {
+    text-align: center;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    line-height: var(--line-height-relaxed);
+}
+
+.login-info a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.login-info a:hover {
+    color: var(--color-primary-dark);
+}
+
+/* Security Badge */
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+}
+
+.security-badge svg {
+    color: var(--color-success);
+}
+
+/* Button Loading State */
+.btn-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.btn-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-gray-300);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }

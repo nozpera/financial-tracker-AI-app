@@ -1,0 +1,35 @@
+/* Auth Callback Page Styles */
+
+.auth-callback-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-50);
+}
+
+.callback-error {
+    text-align: center;
+    padding: var(--spacing-8);
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-4);
+}
+
+.callback-error h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-2);
+}
+
+.callback-error p {
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-6);
+}
