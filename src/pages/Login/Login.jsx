@@ -40,10 +40,13 @@ function Login() {
         fullName: '',
     });
 
-    // Redirect if already authenticated
+    // Redirect if already authenticated (role-based)
     useEffect(() => {
         if (user && profile) {
-            if (hasCompletedRegistration()) {
+            // Check role for redirect
+            if (profile.role === 'superadmin') {
+                navigate('/admin', { replace: true });
+            } else if (hasCompletedRegistration()) {
                 navigate('/', { replace: true });
             } else {
                 navigate('/register', { replace: true });

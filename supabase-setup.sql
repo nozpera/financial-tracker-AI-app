@@ -1,7 +1,7 @@
 -- ============================================
--- FINANCE AI - DATABASE SETUP (FIXED)
+-- FINANCE AI - DATABASE SETUP WITH ROLES
 -- Run this in Supabase SQL Editor
--- Fixes: "infinite recursion detected in policy"
+-- Includes: Role-based access system
 -- ============================================
 
 -- ============================================
@@ -62,10 +62,25 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     email TEXT,
     full_name TEXT,
     avatar_url TEXT,
+    role TEXT DEFAULT 'user' CHECK (role IN ('user', 'superadmin')),
     registration_completed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add role column if it doesn't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'profiles' 
+        AND column_name = 'role'
+    ) THEN
+        ALTER TABLE public.profiles 
+        ADD COLUMN role TEXT DEFAULT 'user' CHECK (role IN ('user', 'superadmin'));
+    END IF;
+END $$;
 
 -- Add registration_completed column if it doesn't exist
 DO $$
@@ -100,6 +115,7 @@ BEGIN
         email, 
         full_name, 
         avatar_url, 
+        role,
         registration_completed,
         created_at,
         updated_at
@@ -113,6 +129,7 @@ BEGIN
             split_part(NEW.email, '@', 1)
         ),
         NEW.raw_user_meta_data->>'avatar_url',
+        'user',  -- Default role is 'user'
         FALSE,
         NOW(),
         NOW()
@@ -147,7 +164,6 @@ CREATE TRIGGER on_auth_user_created
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow users to read their own profile
--- Using a simple direct comparison, no function calls that could recurse
 CREATE POLICY "profiles_select_own"
     ON public.profiles
     FOR SELECT
@@ -163,7 +179,6 @@ CREATE POLICY "profiles_update_own"
     WITH CHECK (id = auth.uid());
 
 -- Policy: Allow insert during signup (the trigger handles this with SECURITY DEFINER)
--- This policy allows the authenticated user to insert their own profile
 CREATE POLICY "profiles_insert_own"
     ON public.profiles
     FOR INSERT
@@ -240,10 +255,44 @@ CREATE POLICY "financial_profiles_delete_own"
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
 CREATE INDEX IF NOT EXISTS idx_financial_profiles_user_id ON public.financial_profiles(user_id);
+
+-- ============================================
+-- STEP 8: CREATE SUPERADMIN HELPER FUNCTION
+-- Use this to promote a user to superadmin
+-- ============================================
+
+CREATE OR REPLACE FUNCTION public.set_user_role(user_email TEXT, new_role TEXT)
+RETURNS VOID
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    UPDATE public.profiles 
+    SET role = new_role, updated_at = NOW()
+    WHERE email = user_email;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ============================================
 -- DONE!
 -- ============================================
 
-SELECT 'SUCCESS: Database setup completed!' as result;
+SELECT 'SUCCESS: Database setup with roles completed!' as result;
+
+-- ============================================
+-- HOW TO CREATE SUPERADMIN:
+-- ============================================
+-- 1. First, create a user account via the app (signup)
+-- 2. Then run this query in SQL Editor:
+--
+--    UPDATE profiles 
+--    SET role = 'superadmin' 
+--    WHERE email = 'your-email@example.com';
+--
+-- OR use the helper function:
+--
+--    SELECT set_user_role('your-email@example.com', 'superadmin');
+--
+-- ============================================

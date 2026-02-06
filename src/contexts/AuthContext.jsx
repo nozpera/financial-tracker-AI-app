@@ -2,7 +2,8 @@
  * Authentication Context
  * 
  * Provides authentication state and methods throughout the app.
- * Handles Email/Password auth, Google OAuth, session persistence, and user profile management.
+ * Handles Email/Password auth, Google OAuth, session persistence,
+ * user profile management, and role-based access.
  */
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -125,7 +126,8 @@ export function AuthProvider({ children }) {
 
             if (data?.user) {
                 setUser(data.user);
-                fetchProfile(data.user.id);
+                const profileData = await fetchProfile(data.user.id);
+                return { data, error: null, profile: profileData };
             }
 
             return { data, error: null };
@@ -225,6 +227,20 @@ export function AuthProvider({ children }) {
     };
 
     /**
+     * Check if user is superadmin
+     */
+    const isSuperAdmin = () => {
+        return profile?.role === 'superadmin';
+    };
+
+    /**
+     * Get user role
+     */
+    const getRole = () => {
+        return profile?.role || 'user';
+    };
+
+    /**
      * Clear error
      */
     const clearError = () => {
@@ -311,6 +327,8 @@ export function AuthProvider({ children }) {
         updateProfile,
         resetPassword,
         hasCompletedRegistration,
+        isSuperAdmin,
+        getRole,
         fetchProfile,
         clearError,
     };
