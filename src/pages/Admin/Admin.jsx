@@ -33,14 +33,14 @@ function Admin() {
         {
             title: 'Login Page',
             description: 'Halaman masuk untuk user',
-            path: '/login',
+            path: '/login?preview=true',
             icon: '🔐',
             color: 'var(--color-secondary)'
         },
         {
             title: 'Register Page',
             description: 'Form registrasi multi-step',
-            path: '/register',
+            path: '/register?preview=true',
             icon: '📝',
             color: 'var(--color-accent)'
         }

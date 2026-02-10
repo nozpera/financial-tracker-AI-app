@@ -41,8 +41,12 @@ function Login() {
     });
 
     // Redirect if already authenticated (role-based)
+    // Note: ?preview=true allows superadmin to view this page without redirect
     useEffect(() => {
-        if (user && profile) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPreviewMode = urlParams.get('preview') === 'true';
+
+        if (user && profile && !isPreviewMode) {
             // Check role for redirect
             if (profile.role === 'superadmin') {
                 navigate('/admin', { replace: true });

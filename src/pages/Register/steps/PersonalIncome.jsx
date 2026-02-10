@@ -1,7 +1,12 @@
 /**
  * Step 1: Personal & Income
  * 
- * Collects employment status, industry, income, and salary date.
+ * Collects employment status, industry, income details with improved
+ * data validity for AI analysis.
+ * 
+ * Improvements:
+ * - Income stability indicator (for freelancer/business)
+ * - Gross vs Net income type
  */
 
 const EMPLOYMENT_OPTIONS = [
@@ -25,7 +30,13 @@ const INDUSTRY_OPTIONS = [
     'Lainnya',
 ];
 
+// Employment types that require income stability question
+const VARIABLE_INCOME_TYPES = ['freelance', 'business_owner'];
+
 function PersonalIncome({ formData, updateFormData, errors }) {
+    // Check if user has variable income type
+    const hasVariableIncome = VARIABLE_INCOME_TYPES.includes(formData.employment_status);
+
     return (
         <div className="step-form">
             {/* Employment Status */}
@@ -56,6 +67,61 @@ function PersonalIncome({ formData, updateFormData, errors }) {
                 )}
             </div>
 
+            {/* Income Stability - Only for Freelancer/Business Owner */}
+            {hasVariableIncome && (
+                <div className="form-group">
+                    <label className="form-label">
+                        Stabilitas Pendapatan <span className="required">*</span>
+                    </label>
+                    <p className="form-description">
+                        Apakah pendapatan Anda stabil setiap bulan?
+                    </p>
+                    <div className="options-row">
+                        <label
+                            className={`option-card horizontal ${formData.income_stability === 'stable' ? 'selected' : ''}`}
+                        >
+                            <input
+                                type="radio"
+                                name="income_stability"
+                                value="stable"
+                                checked={formData.income_stability === 'stable'}
+                                onChange={(e) => updateFormData('income_stability', e.target.value)}
+                            />
+                            <span className="option-icon">📊</span>
+                            <div className="option-content">
+                                <span className="option-text">Stabil</span>
+                                <span className="option-hint">Pendapatan relatif sama setiap bulan</span>
+                            </div>
+                        </label>
+                        <label
+                            className={`option-card horizontal ${formData.income_stability === 'fluctuating' ? 'selected' : ''}`}
+                        >
+                            <input
+                                type="radio"
+                                name="income_stability"
+                                value="fluctuating"
+                                checked={formData.income_stability === 'fluctuating'}
+                                onChange={(e) => updateFormData('income_stability', e.target.value)}
+                            />
+                            <span className="option-icon">📈</span>
+                            <div className="option-content">
+                                <span className="option-text">Fluktuatif</span>
+                                <span className="option-hint">Pendapatan naik-turun setiap bulan</span>
+                            </div>
+                        </label>
+                    </div>
+                    {formData.income_stability === 'fluctuating' && (
+                        <div className="info-box">
+                            <span className="info-icon">💡</span>
+                            <p>AI akan menggunakan rata-rata 3 bulan terakhir untuk estimasi cashflow yang lebih akurat.</p>
+                        </div>
+                    )}
+                    {errors.income_stability && (
+                        <span className="form-error">⚠️ {errors.income_stability}</span>
+                    )}
+                </div>
+            )}
+
             {/* Industry */}
             <div className="form-group">
                 <label className="form-label" htmlFor="industry">
@@ -74,10 +140,40 @@ function PersonalIncome({ formData, updateFormData, errors }) {
                 </select>
             </div>
 
+            {/* Income Type Toggle */}
+            <div className="form-group">
+                <label className="form-label">
+                    Jenis Pendapatan yang Akan Diinput
+                </label>
+                <div className="toggle-options">
+                    <button
+                        type="button"
+                        className={`toggle-option ${formData.income_type === 'net' ? 'active' : ''}`}
+                        onClick={() => updateFormData('income_type', 'net')}
+                    >
+                        <span className="toggle-label">Bersih (Take Home Pay)</span>
+                        <span className="toggle-hint">Setelah potong pajak & BPJS</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`toggle-option ${formData.income_type === 'gross' ? 'active' : ''}`}
+                        onClick={() => updateFormData('income_type', 'gross')}
+                    >
+                        <span className="toggle-label">Kotor (Gross)</span>
+                        <span className="toggle-hint">Sebelum potong pajak</span>
+                    </button>
+                </div>
+                <span className="form-hint">
+                    {formData.income_type === 'gross'
+                        ? 'AI akan menghitung estimasi pajak dan penghasilan bersih Anda'
+                        : 'Pendapatan bersih yang Anda terima setiap bulan'}
+                </span>
+            </div>
+
             {/* Monthly Income */}
             <div className="form-group">
                 <label className="form-label" htmlFor="monthly_income">
-                    Pendapatan Bulanan <span className="required">*</span>
+                    Pendapatan Bulanan {formData.income_type === 'gross' ? '(Kotor)' : '(Bersih)'} <span className="required">*</span>
                 </label>
                 <div className="input-with-prefix">
                     <span className="input-prefix">Rp</span>
@@ -91,7 +187,11 @@ function PersonalIncome({ formData, updateFormData, errors }) {
                         min="0"
                     />
                 </div>
-                <span className="form-hint">Pendapatan bersih setelah pajak</span>
+                {formData.income_stability === 'fluctuating' && (
+                    <span className="form-hint highlight">
+                        💡 Masukkan rata-rata pendapatan 3 bulan terakhir
+                    </span>
+                )}
                 {errors.monthly_income && (
                     <span className="form-error">⚠️ {errors.monthly_income}</span>
                 )}
@@ -148,6 +248,7 @@ function PersonalIncome({ formData, updateFormData, errors }) {
                     {[...Array(31)].map((_, i) => (
                         <option key={i + 1} value={i + 1}>Tanggal {i + 1}</option>
                     ))}
+                    <option value="varies">Tidak Tentu</option>
                 </select>
                 <span className="form-hint">Untuk menghitung siklus pengeluaran Anda</span>
                 {errors.salary_date && (
